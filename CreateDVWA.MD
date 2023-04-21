@@ -1,3 +1,4 @@
+## Create DMZ
 ````
 # Create Resource Group
 az group create -l eastus -n lab-ftnt-rg
@@ -12,6 +13,19 @@ az network nsg create -n dmz-nsg -g lab-ftnt-rg
 az network nsg rule create -g lab-ftnt-rg --nsg-name dmz-nsg -n AllowSshIngress --priority 1000 --protocol TCP --destination-port-range 22 --access allow
  
 # Create VM
-az vm create -n linuxssh -g lab-ftnt-rg --image UbuntuLTS --admin-username azureadmin --admin-password <set-a-password> --vnet-name workload-vnet --subnet dmz-protected-a --nsg dmz-nsg
-az vm create -n dvwa -g lab-ftnt-rg --image UbuntuLTS --admin-username azureadmin --admin-password <set-a-password> --vnet-name workload-vnet --subnet dmz-protected-a --nsg dmz-nsg
+az vm create -n linuxssh -g lab-ftnt-rg --image UbuntuLTS --admin-username azureadmin --admin-password <set-a-password> --vnet-name workload-vnet --subnet dmz-protected-a --nsg dmz-nsg --public-ip-address ""
+az vm create -n dvwa -g lab-ftnt-rg --image UbuntuLTS --admin-username azureadmin --admin-password <set-a-password> --vnet-name workload-vnet --subnet dmz-protected-a --nsg dmz-nsg --public-ip-address ""
+````
+
+## Post Install Tasks on dvwa VM
+````
+sudo snap install docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+````
+
+## Install and Run Docker Container
+````
+docker pull vulnerables/web-dvwa
+docker run --restart=always -p 80:80 -d --name dvwa vulnerables/web-dvwa
 ````
